@@ -1,9 +1,18 @@
 package com.github.cheatank.server.utils
 import com.github.cheatank.common.Packet
 import com.github.cheatank.common.PacketType
+import com.github.cheatank.common.RawPacket
 import com.github.cheatank.common.data.PacketData
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.readBytes
 import io.ktor.websocket.DefaultWebSocketServerSession
+
+/**
+ * パケットとして取得する
+ */
+fun Frame.Binary.readPacket(): RawPacket? {
+    return Packet.fromByteArray(readBytes())
+}
 
 /**
  * パケットを送信する。
