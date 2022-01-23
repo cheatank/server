@@ -12,8 +12,6 @@ data class Game(
     private val sessions: List<DefaultWebSocketServerSession>,
 ) {
     suspend fun start() {
-        sessions.forEach {
-            it.sendPacket(PacketType.StartGame, ConfigData(2, 3 * 60))
-        }
+        sessions.sendPacket(PacketType.StartGame, ConfigData(2, 3 * 60))
     }
 }

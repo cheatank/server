@@ -15,3 +15,14 @@ suspend fun <T : PacketData> DefaultWebSocketServerSession.sendPacket(packetType
     val frame = Frame.Binary(true, bytes)
     send(frame)
 }
+
+/**
+ * パケットを送信する。
+ * @param packetType
+ * @param data
+ */
+suspend fun <T : PacketData> List<DefaultWebSocketServerSession>.sendPacket(packetType: PacketType<T>, data: T) {
+    val bytes = Packet.toByteArray(packetType, data)
+    val frame = Frame.Binary(true, bytes)
+    forEach { it.send(frame) }
+}
