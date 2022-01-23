@@ -6,6 +6,9 @@ import com.github.cheatank.common.data.IntData
 import com.github.cheatank.server.utils.sendPacket
 import io.ktor.websocket.DefaultWebSocketServerSession
 
+/**
+ * [PacketType.GetVersion] に対して [PacketType.SendVersion] を返す
+ */
 suspend fun DefaultWebSocketServerSession.getVersion() {
     sendPacket(PacketType.SendVersion, IntData(PacketVersion))
 }
