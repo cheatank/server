@@ -4,6 +4,7 @@ import com.github.cheatank.common.PacketType
 import com.github.cheatank.common.data.ConfigData
 import com.github.cheatank.common.data.EmptyPacketData
 import com.github.cheatank.common.data.ShortData
+import com.github.cheatank.server.utils.close
 import com.github.cheatank.server.utils.sendPacket
 import io.ktor.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.delay
@@ -33,6 +34,7 @@ data class Game(
             delay(1000)
             if (time == 0.toShort()) {
                 sessions.sendPacket(PacketType.EndGame, EmptyPacketData)
+                sessions.close()
                 return
             } else {
                 time --

@@ -4,6 +4,7 @@ import com.github.cheatank.common.PacketType
 import com.github.cheatank.common.RawPacket
 import com.github.cheatank.common.data.PacketData
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readBytes
 import io.ktor.websocket.DefaultWebSocketServerSession
 
@@ -33,5 +34,14 @@ suspend fun <T : PacketData> DefaultWebSocketServerSession.sendPacket(packetType
 suspend fun <T : PacketData> List<DefaultWebSocketServerSession>.sendPacket(packetType: PacketType<T>, data: T) {
     forEach {
         it.sendPacket(packetType, data)
+    }
+}
+
+/**
+ * セッションを閉じる
+ */
+suspend fun List<DefaultWebSocketServerSession>.close() {
+    forEach {
+        it.close()
     }
 }
