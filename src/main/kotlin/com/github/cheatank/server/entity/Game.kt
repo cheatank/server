@@ -8,6 +8,7 @@ import com.github.cheatank.common.data.ShortData
 import com.github.cheatank.server.utils.close
 import com.github.cheatank.server.utils.readPacket
 import com.github.cheatank.server.utils.sendPacket
+import com.github.cheatank.server.utils.trySendPacket
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +25,9 @@ data class Game(
     private val sessions: List<DefaultWebSocketServerSession>,
 ) {
     private val sessionById: Map<Short, DefaultWebSocketServerSession>
-    private val timeLimit: Short = 3 * 60
+    private val timeLimit: Short = System.getProperty("timeLimit")?.toShortOrNull() ?: 180
     private var time = timeLimit
+    private val lifeCount: Byte = System.getProperty("lifeCount")?.toByteOrNull() ?: 2
 
     init {
         val id = AtomicInteger(0)
@@ -37,7 +39,7 @@ data class Game(
      */
     suspend fun start() {
         sessionById.forEach { (id, session) ->
-            session.sendPacket(PacketType.StartGame, GameData(id, 2, timeLimit))
+            session.sendPacket(PacketType.StartGame, GameData(id, lifeCount, timeLimit))
         }
         sendInitialLocation()
         withContext(Dispatchers.Unconfined) {
@@ -89,7 +91,7 @@ data class Game(
                 return
             } else {
                 time --
-                sessions.sendPacket(PacketType.Countdown, ShortData(time))
+                sessions.trySendPacket(PacketType.Countdown, ShortData(time))
             }
         }
     }
