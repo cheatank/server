@@ -1,7 +1,6 @@
 package com.github.cheatank.server.entity
 
 import com.github.cheatank.common.PacketType
-import com.github.cheatank.common.data.EmptyPacketData
 import com.github.cheatank.common.data.GameData
 import com.github.cheatank.common.data.ShortData
 import com.github.cheatank.server.utils.close
@@ -44,7 +43,7 @@ data class Game(
         while (true) {
             delay(1000)
             if (time == 0.toShort()) {
-                sessions.sendPacket(PacketType.EndGame, EmptyPacketData)
+                sessions.sendPacket(PacketType.EndGame, ShortData(-1))
                 sessions.close()
                 return
             } else {
