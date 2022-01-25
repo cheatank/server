@@ -5,6 +5,8 @@ import com.github.cheatank.common.data.GameData
 import com.github.cheatank.common.data.LocationData
 import com.github.cheatank.common.data.SelfLocationData
 import com.github.cheatank.common.data.ShortData
+import com.github.cheatank.server.Options.lifeCount
+import com.github.cheatank.server.Options.timeLimit
 import com.github.cheatank.server.utils.close
 import com.github.cheatank.server.utils.readPacket
 import com.github.cheatank.server.utils.sendPacket
@@ -16,7 +18,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -25,15 +26,10 @@ import java.util.concurrent.atomic.AtomicInteger
 data class Game(
     private val sessions: List<DefaultWebSocketServerSession>,
 ) {
-    private val logger = LoggerFactory.getLogger("Game@${hashCode()}")
     private val sessionById: Map<Short, DefaultWebSocketServerSession>
-    private val timeLimit: Short = System.getProperty("timeLimit")?.toShortOrNull() ?: 180
     private var time = timeLimit
-    private val lifeCount: Byte = System.getProperty("lifeCount")?.toByteOrNull() ?: 2
 
     init {
-        logger.info("timeLimit: $timeLimit")
-        logger.info("lifeCount: $lifeCount")
         val id = AtomicInteger(0)
         sessionById = sessions.associateBy { id.getAndIncrement().toShort() }
     }
