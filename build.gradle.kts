@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.6.0"
     id("org.jmailen.kotlinter") version "3.7.0"
+    application
 }
 
 group = "com.github.cheatank"
@@ -20,4 +21,8 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:1.7.33")
     testImplementation(kotlin("test"))
     testImplementation("io.ktor:ktor-server-test-host:1.6.7")
+}
+
+application {
+    mainClass.set("com.github.cheatank.server.MainKt")
 }
