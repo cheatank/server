@@ -2,6 +2,7 @@ package com.github.cheatank.server.entity
 
 import com.github.cheatank.common.PacketType
 import com.github.cheatank.common.data.GameData
+import com.github.cheatank.common.data.LocationData
 import com.github.cheatank.common.data.ShortData
 import com.github.cheatank.server.utils.close
 import com.github.cheatank.server.utils.sendPacket
@@ -32,6 +33,11 @@ data class Game(
     suspend fun start() {
         sessionById.forEach { (id, session) ->
             session.sendPacket(PacketType.StartGame, GameData(id, 2, timeLimit))
+        }
+        var x = 100
+        sessionById.forEach { (id, _) ->
+            sessions.sendPacket(PacketType.UpdateLocation, LocationData(id, x, 100, 0))
+            x += 200
         }
         countdown()
     }
