@@ -1,4 +1,5 @@
 package com.github.cheatank.server.utils
+
 import com.github.cheatank.common.Packet
 import com.github.cheatank.common.PacketType
 import com.github.cheatank.common.RawPacket
@@ -59,7 +60,7 @@ fun <T : PacketData> DefaultWebSocketServerSession.trySendPacket(packetType: Pac
  * @param data
  */
 fun <T : PacketData> List<DefaultWebSocketServerSession>.trySendPacket(packetType: PacketType<T>, data: T): List<ChannelResult<Unit>> {
-   return map {
+    return map {
         it.trySendPacket(packetType, data)
     }
 }
