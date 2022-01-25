@@ -6,6 +6,8 @@ import com.github.cheatank.common.data.LocationData
 import com.github.cheatank.common.data.SelfLocationData
 import com.github.cheatank.common.data.ShortData
 import com.github.cheatank.server.Options.lifeCount
+import com.github.cheatank.server.Options.longDistanceThreshold
+import com.github.cheatank.server.Options.suppressCheat
 import com.github.cheatank.server.Options.timeLimit
 import com.github.cheatank.server.utils.close
 import com.github.cheatank.server.utils.readPacket
@@ -18,6 +20,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -26,8 +29,10 @@ import java.util.concurrent.atomic.AtomicInteger
 data class Game(
     private val sessions: List<DefaultWebSocketServerSession>,
 ) {
+    private val logger = LoggerFactory.getLogger("Game@${hashCode()}")
     private val sessionById: Map<Short, DefaultWebSocketServerSession>
     private var time = timeLimit
+    private val locationChecker = if (suppressCheat) LocationChecker.SuppressLongMove(longDistanceThreshold) else LocationChecker.Nothing
 
     init {
         val id = AtomicInteger(0)
@@ -53,9 +58,16 @@ data class Game(
                                 when (packet.id) {
                                     PacketType.UpdateSelfLocation.id -> {
                                         val (x, y, yaw) = packet.toPacket(PacketType.UpdateSelfLocation)?.data as? SelfLocationData ?: continue
-                                        sessions.forEach {
-                                            if (it != session) {
-                                                it.sendPacket(PacketType.UpdateLocation, LocationData(id, x, y, yaw))
+                                        locationChecker.moveTo(id, x, y)?.let { (_x, _y) ->
+                                            logger.trace("$id rollback: ($x, $y) -> ($_x, $_y)")
+                                            sessions.forEach { // rollback
+                                                it.sendPacket(PacketType.UpdateLocation, LocationData(id, _x, _y, yaw))
+                                            }
+                                        } ?: run {
+                                            sessions.forEach {
+                                                if (it != session) {
+                                                    it.sendPacket(PacketType.UpdateLocation, LocationData(id, x, y, yaw))
+                                                }
                                             }
                                         }
                                     }
@@ -74,7 +86,9 @@ data class Game(
     private suspend fun sendInitialLocation() {
         var x = 100
         sessionById.forEach { (id, _) ->
-            sessions.sendPacket(PacketType.UpdateLocation, LocationData(id, x, 100, 0))
+            val y = 100
+            locationChecker.moveTo(id, x, y)
+            sessions.sendPacket(PacketType.UpdateLocation, LocationData(id, x, y, 0))
             x += 200
         }
     }

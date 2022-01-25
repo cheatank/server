@@ -12,11 +12,13 @@ object Options {
         "", "true" -> true
         else -> false
     }
+    val longDistanceThreshold = System.getProperty("longDistanceThreshold")?.toDoubleOrNull() ?: 10.0
 
     fun load() {
         val logger = LoggerFactory.getLogger("Options")
         logger.info("timeLimit: $timeLimit")
         logger.info("lifeCount: $lifeCount")
         logger.info("suppressCheat: $suppressCheat")
+        logger.info("longDistanceThreshold: $longDistanceThreshold")
     }
 }
