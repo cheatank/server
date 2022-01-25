@@ -1,13 +1,14 @@
 package com.github.cheatank.server.entity
 
 import com.github.cheatank.common.PacketType
-import com.github.cheatank.common.data.ConfigData
 import com.github.cheatank.common.data.EmptyPacketData
+import com.github.cheatank.common.data.GameData
 import com.github.cheatank.common.data.ShortData
 import com.github.cheatank.server.utils.close
 import com.github.cheatank.server.utils.sendPacket
 import io.ktor.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.delay
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * ゲーム
@@ -15,14 +16,24 @@ import kotlinx.coroutines.delay
 data class Game(
     private val sessions: List<DefaultWebSocketServerSession>,
 ) {
+    private val sessionById: Map<Short, DefaultWebSocketServerSession>
+    private val idBySession: Map<DefaultWebSocketServerSession, Short>
     private val timeLimit: Short = 3 * 60
     private var time = timeLimit
+
+    init {
+        val id = AtomicInteger(0)
+        sessionById = sessions.associateBy { id.getAndIncrement().toShort() }
+        idBySession = sessionById.entries.associate { (key, value) -> value to key }
+    }
 
     /**
      * ゲームを開始する
      */
     suspend fun start() {
-        sessions.sendPacket(PacketType.StartGame, ConfigData(2, timeLimit))
+        sessionById.forEach { (id, session) ->
+            session.sendPacket(PacketType.StartGame, GameData(id, 2, timeLimit))
+        }
         countdown()
     }
 
