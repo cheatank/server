@@ -1,6 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm") version "1.6.0"
     id("org.jmailen.kotlinter") version "3.7.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     application
 }
 
@@ -25,4 +28,8 @@ dependencies {
 
 application {
     mainClass.set("com.github.cheatank.server.MainKt")
+}
+
+tasks.withType<ShadowJar> {
+    archiveClassifier.set("")
 }
