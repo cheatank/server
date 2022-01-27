@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.github.cheatank"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.github.cheatank:common:1.0.0-SNAPSHOT")
+    implementation("com.github.cheatank:common:1.0.0")
     implementation("io.ktor:ktor-server-core:1.6.7")
     implementation("io.ktor:ktor-server-cio:1.6.7")
     implementation("io.ktor:ktor-websockets:1.6.7")
